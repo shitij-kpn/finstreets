@@ -1,5 +1,12 @@
 require("dotenv").config();
-const { sequelize, Event, User, event_info, ContactUs } = require("./models");
+const {
+  sequelize,
+  Event,
+  User,
+  event_info,
+  ContactUs,
+  event_coupon_code,
+} = require("./models");
 const express = require("express");
 // const config = require("./config");
 const app = express();
@@ -9,23 +16,6 @@ var http = require("http").createServer(app);
 app.use(express.json());
 
 const sendEmail = require("./utils/email");
-
-app.get("/api/events", async (req, res) => {
-  try {
-    const results = await Event.findAll();
-    if (results) {
-      return res.json({
-        status: "success",
-        data: results,
-      });
-    } else {
-      res.send("there are no results");
-    }
-  } catch (error) {
-    console.log(error);
-    res.json(error);
-  }
-});
 
 const checkIfUserverified = async (email) => {
   return User.findOne({
@@ -191,6 +181,41 @@ app.get("/api/logout", async (req, res) => {
   res.status(200).json({ status: "success" });
 });
 
+//get all events
+app.get("/api/events", async (req, res) => {
+  try {
+    const results = await Event.findAll();
+    if (results) {
+      return res.json({
+        status: "success",
+        data: results,
+      });
+    } else {
+      res.send("there are no results");
+    }
+  } catch (error) {
+    console.log(error);
+    res.json(error);
+  }
+});
+
+//all events with info
+app.get("/api/event_info", async (req, res) => {
+  try {
+    const data = await event_info.findAll();
+    return res.json({
+      status: "success",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      status: "fail",
+      message: "no data found",
+    });
+  }
+});
+
 // add users to contact us
 app.get("/api/contactus", async (req, res) => {
   const { name, email, msg, phone, time, from_ip, from_browser } = req.body;
@@ -210,38 +235,6 @@ app.get("/api/contactus", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.send("there was an error");
-  }
-});
-
-//get all events
-app.get("/api/all_events", async (req, res) => {
-  const allCourses = await Event.findAll();
-  if (allCourses) {
-    return res.json({
-      status: "success",
-      data: allCourses,
-    });
-  }
-  res.json({
-    status: "fail",
-    message: "no data found",
-  });
-});
-
-//all events with info
-app.get("/api/event_info", async (req, res) => {
-  try {
-    const data = await event_info.findAll();
-    return res.json({
-      status: "success",
-      data,
-    });
-  } catch (error) {
-    console.log(error);
-    res.json({
-      status: "fail",
-      message: "no data found",
-    });
   }
 });
 
