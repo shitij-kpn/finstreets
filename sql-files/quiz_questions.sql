@@ -1,0 +1,5 @@
+INSERT INTO quiz_questions (ques_id, question, choice1, choice2, choice3, choice4, answer, time, from_ip, from_browser) VALUES
+(6, ' Which hurdle, while the easiest to overcome, is often the biggest killer to a personalization project? ', ' Having the right team in place ', 'Knowing your audience', 'Developing a proper strategy ', 'Implementing the right technology', '1', '', '', ''),
+(7, ' Which hurdle, while the easiest to overcome, is often the biggest killer to a personalization project?', 'Having enough content ', 'Having enough content ', ' Having enough content ', 'Implementing the right technology', '2', '', '', ''),
+(8, ' Which hurdle, while the easiest to overcome, is often the biggest killer to a personalization project? ', ' Having the right team in place ', 'Knowing your audience', 'Developing a proper strategy ', 'Implementing the right technology', '3', '', '', ''),
+(9, ' Which hurdle, while the easiest to overcome, is often the biggest killer to a personalization project? ', ' Having the right team in place ', 'Knowing your audience', 'Developing a proper strategy ', 'Implementing the right technology', '4', '', '', '');

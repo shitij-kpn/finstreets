@@ -1,0 +1,4 @@
+INSERT INTO rewards_request (id, email, badge, status, from_ip, from_browser, time) VALUES
+(39, 'sharangopal36@gmail.com', '1', 'paid', '::1', 'Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Mobile Safari/537.36', 'Mon, 20 Apr 2020 17:35:36 +0530'),
+(40, 'sharangopal36@gmail.com', '2', 'paid', '::1', 'Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Mobile Safari/537.36', 'Mon, 20 Apr 2020 17:35:39 +0530'),
+(41, 'sharangopal36@gmail.com', '3', 'paid', '::1', 'Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Mobile Safari/537.36', 'Mon, 20 Apr 2020 17:35:42 +0530');
