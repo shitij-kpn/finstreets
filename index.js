@@ -6,7 +6,6 @@ const app = express();
 const jwt = require("jsonwebtoken");
 
 var http = require("http").createServer(app);
-// var io = require('socket.io')(http);
 app.use(express.json());
 
 const sendEmail = require("./utils/email");
@@ -192,17 +191,22 @@ app.get("/api/logout", async (req, res) => {
   res.status(200).json({ status: "success" });
 });
 
+// add users to contact us
 app.get("/api/contactus", async (req, res) => {
+  const { name, email, msg, phone, time, from_ip, from_browser } = req.body;
   try {
-    const data = await ContactUs.findAll();
-    if (data) {
-      res.json({
-        status: "success",
-        data,
-      });
-    } else {
-      res.send("there is no data");
-    }
+    const data = await ContactUs.create({
+      name,
+      email,
+      msg,
+      phone,
+      time,
+      from_ip,
+      from_browser,
+    });
+    res.json({
+      status: "success",
+    });
   } catch (error) {
     console.log(error);
     res.send("there was an error");
