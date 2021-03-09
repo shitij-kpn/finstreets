@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { sequelize, Event, User } = require("./models");
+const { sequelize, Event, User, event_info, ContactUs } = require("./models");
 const express = require("express");
 // const config = require("./config");
 const app = express();
@@ -37,7 +37,7 @@ const checkIfUserverified = async (email) => {
   });
 };
 
-const checkIotp = async (email, otp) => {
+const checkotp = async (email, otp) => {
   return User.findOne({
     where: {
       email,
@@ -119,7 +119,7 @@ app.get("/api/register", async (req, res) => {
         const result = await sendEmail(email, OTP);
         return res.send("OTP send to email: " + OTP);
       }
-      res.send({ status: "failure", msg: "Email already exist" });
+      res.send({ status: "fail", msg: "Email already exist" });
     }
   } catch (error) {
     console.log(error);
@@ -147,11 +147,11 @@ app.get("/api/login", async (req, res) => {
   const { email } = req.body;
   const exists = await checkIfUserExists(email);
   if (!exists) {
-    res.send({ status: "failure", message: "email is not registered" });
+    res.send({ status: "fail", message: "email is not registered" });
   } else {
     const checkverified = await checkIfUserverified(email);
     if (!checkverified) {
-      return res.send({ status: "failure", msg: "verify is not registered" });
+      return res.send({ status: "fail", msg: "verify is not registered" });
     } else {
       const currentUser = await User.findOne({
         where: {
@@ -171,9 +171,9 @@ app.get("/api/login", async (req, res) => {
 // verify
 app.get("/api/verify", async (req, res) => {
   const { email, otp } = req.body;
-  const exists = await checkIotp(email, otp);
+  const exists = await checkotp(email, otp);
   if (!exists) {
-    res.send({ status: "failure", msg: "Otp is incorrect" });
+    res.send({ status: "fail", msg: "Otp is incorrect" });
   } else {
     exists.otp = null;
     exists.save();
@@ -192,228 +192,54 @@ app.get("/api/logout", async (req, res) => {
   res.status(200).json({ status: "success" });
 });
 
-// //get all course
-// app.get("/api/all_courses", async (req, res) => {
-//   const allCourses = await Category.findAll({
-//     attributes: ["uuid", "category_type", "category_name"],
-//     include: [
-//       {
-//         model: Course,
-//         attributes: [
-//           "uuid",
-//           "course_name",
-//           "course_thumb_img",
-//           "course_ratings",
-//           "course_duration",
-//           "course_sale_price",
-//           "course_base_price",
-//           "category_type",
-//         ],
-//       },
-//     ],
-//   });
-//   if (allCourses) {
-//     return res.json({
-//       status: "success",
-//       data: allCourses,
-//     });
-//   }
-//   res.json({
-//     status: "failure",
-//     message: "no data found",
-//   });
-// });
+app.get("/api/contactus", async (req, res) => {
+  try {
+    const data = await ContactUs.findAll();
+    if (data) {
+      res.json({
+        status: "success",
+        data,
+      });
+    } else {
+      res.send("there is no data");
+    }
+  } catch (error) {
+    console.log(error);
+    res.send("there was an error");
+  }
+});
 
-// //courses from 1 Category
-// app.get("/api/category_all_courses", async (req, res) => {
-//   const { category_type } = req.query;
-//   try {
-//     const data = await Category.findOne({
-//       attributes: ["uuid", "category_type", "category_name"],
-//       include: [
-//         {
-//           model: Course,
-//           attributes: [
-//             "uuid",
-//             "course_name",
-//             "course_thumb_img",
-//             "course_ratings",
-//             "course_duration",
-//             "course_sale_price",
-//             "course_base_price",
-//             "category_type",
-//           ],
-//         },
-//       ],
-//       where: {
-//         category_type,
-//       },
-//     });
-//     return res.json({
-//       status: "success",
-//       data,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.json({
-//       status: "failure",
-//       message: "no data found",
-//     });
-//   }
-// });
+//get all events
+app.get("/api/all_events", async (req, res) => {
+  const allCourses = await Event.findAll();
+  if (allCourses) {
+    return res.json({
+      status: "success",
+      data: allCourses,
+    });
+  }
+  res.json({
+    status: "fail",
+    message: "no data found",
+  });
+});
 
-// //single course with FAQ, modules,chapters,teachers,Why_join
-// app.get("/api/single_course", async (req, res) => {
-//   const { course_uuid } = req.query;
-//   try {
-//     let courseData = await Course.findOne({
-//       where: {
-//         uuid: course_uuid,
-//       },
-//       attributes: [
-//         "uuid",
-//         "course_name",
-//         "course_desc",
-//         "course_thumb_img",
-//         "course_img",
-//         "course_join_img",
-//         "course_ratings",
-//         "course_duration",
-//         "course_sale_price",
-//         "course_base_price",
-//         "course_video_url",
-//         "course_state",
-//         "category_type",
-//         "ref_id",
-//       ],
-//       include: [
-//         {
-//           model: Module,
-//           as: "modules",
-//           attributes: ["uuid", "module_name", "ref_id"],
-//           include: [
-//             {
-//               model: Chapter,
-//               as: "chapters",
-//               attributes: ["uuid", "chapter_name", "video_src"],
-//             },
-//           ],
-//         },
-//         {
-//           model: Faq,
-//           as: "faqs",
-//           attributes: ["uuid", "question", "answer", "ref_id"],
-//         },
-//         {
-//           model: Teacher,
-//           as: "teachers",
-//           attributes: ["uuid", "prof_name", "prof_desc", "prof_img"],
-//           through: { attributes: [] },
-//         },
-//         {
-//           model: Why_join,
-//           as: "why_joins",
-//           attributes: ["uuid", "question", "answer", "ref_id"],
-//         },
-//       ],
-//     });
-//     if (courseData) {
-//       return res.json({
-//         status: "success",
-//         data: courseData,
-//       });
-//     }
-//   } catch (error) {
-//     console.log(error);
-//     res.json({
-//       status: "failure",
-//       message: "no course found",
-//     });
-//   }
-// });
-
-// const checkIfOrderExists = async (whereObject) => {
-//   return order_courses.findOne({
-//     where: whereObject,
-//   });
-// };
-
-// app.get("/api/order_courses", async (req, res) => {
-//   const requestData = {
-//     phonenumber: req.body.phonenumber,
-//     name: req.body.name,
-//     address: req.body.address,
-//     city: req.body.city,
-//     state: req.body.state,
-//     pincode: req.body.pincode,
-//     referral_id: req.body.referral_id,
-//     from_ip: req.body.from_ip,
-//     from_browser: req.body.from_browser,
-//     amount: req.body.amount,
-//     product_id: req.body.product_id,
-//     payment_type: req.body.payment_type,
-//   };
-//   try {
-//     //check if already exists
-//     const exists = await checkIfOrderExists({
-//       phonenumber: requestData.phonenumber,
-//       product_id: requestData.product_id,
-//     });
-//     if (exists) {
-//       return res.json({
-//         status: "failure",
-//         message: "already purchased",
-//       });
-//     }
-//     const result = await order_courses.create(requestData);
-//     return res.json({
-//       status: "success",
-//       data: result,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.send("there was an error");
-//   }
-// });
-
-// app.get("/api/update_order_courses", async (req, res) => {
-//   const { uuid, phonenumber, payment_id } = req.body;
-//   try {
-//     //check if order exists
-//     const exists = await checkIfOrderExists({ uuid });
-//     if (exists) {
-//       exists.status = "Paid";
-//       exists.payment_id = payment_id;
-//       exists.save();
-//       return res.json({
-//         status: "success",
-//         message: "Payment successful",
-//       });
-//     }
-//     res.send("this id does not exist");
-//   } catch (error) {
-//     console.log(error);
-//     res.send("there was an error check console");
-//   }
-// });
-
-// app.get("/api/check_order", async (req, res) => {
-//   const { uuid, phonenumber } = req.body;
-//   try {
-//     const exists = await checkIfOrderExists({ uuid });
-//     if (exists) {
-//       const orderData = exists.toJSON();
-//       return res.json({
-//         status: orderData.status,
-//         data: orderData,
-//       });
-//     }
-//     res.send("no data found");
-//   } catch (error) {
-//     console.log(error);
-//     res.send("there was an error check console");
-//   }
-// });
+//all events with info
+app.get("/api/event_info", async (req, res) => {
+  try {
+    const data = await event_info.findAll();
+    return res.json({
+      status: "success",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      status: "fail",
+      message: "no data found",
+    });
+  }
+});
 
 http.listen(process.env.PORT, async () => {
   console.log(`server running on port ${process.env.PORT}`);
